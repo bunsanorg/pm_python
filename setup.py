@@ -1,17 +1,8 @@
 from distutils.core import setup
 from distutils.extension import Extension
-from Cython.Distutils import build_ext
+from Cython.Build import cythonize
 
 from os.path import join
-
-cfg = {
-    'libraries': ['bunsan_pm_compatibility'],
-    'extra_compile_args': ['-std=c99']
-}
-
-ext_modules = [
-    Extension('pm', [join('src', 'bunsan', 'pm.pyx')], **cfg)
-]
 
 setup(
     name = 'bunsan::pm',
@@ -19,8 +10,7 @@ setup(
     description = 'bunsan::pm python wrapper',
     author = 'Aleksey Filippov',
     author_email = 'sarum9in@gmail.com',
-    url = '',
-    cmdclass = {'build_ext': build_ext},
+    url = 'https://github.com/sarum9in/bunsan_pm_python',
     ext_package = 'bunsan',
-    ext_modules = ext_modules
+    ext_modules = cythonize('src/bunsan/pm.pyx')
 )
