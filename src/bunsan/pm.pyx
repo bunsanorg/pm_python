@@ -24,7 +24,10 @@ cdef extern from "bunsan/pm/compatibility/repository.hpp" namespace "bunsan::pm:
         repository(string config) nogil except +
         void create(string path, bool strip) nogil except +
         void extract(string package, string path) nogil except +
-        void clean() nogil except +
+        void clean_cache() nogil except +
+
+cdef extern from "bunsan/pm/compatibility/repository.hpp" namespace "bunsan::pm::compatibility::repository":
+    void initialize_cache(string path) nogil except +
 
 
 cdef class Repository(object):
@@ -51,6 +54,12 @@ cdef class Repository(object):
         with nogil:
             self.thisptr.extract(package_, path_)
 
-    def clean(self):
+    @staticmethod
+    def initialize_cache(str config):
+        cdef string config_ = _encode(config)
         with nogil:
-            self.thisptr.clean()
+            initialize_cache(config_)
+
+    def clean_cache(self):
+        with nogil:
+            self.thisptr.clean_cache()
