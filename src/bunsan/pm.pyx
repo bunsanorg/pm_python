@@ -12,8 +12,10 @@ from libcpp.string cimport string
 cdef str _getlocale():
     return locale.getlocale()[1]
 
+
 cdef bytes _encode(str s):
     return s.encode(_getlocale())
+
 
 cdef str _decode(bytes s):
     return s.decode(_getlocale())
@@ -30,6 +32,28 @@ cdef extern from "bunsan/pm/compatibility/repository.hpp" namespace "bunsan::pm:
     void initialize_cache(string path) nogil except +
 
 
+class Error(RuntimeError):
+
+    def __init__(self, *args, **kwargs):
+        super(Error, self).__init__(args, kwargs)
+
+
+class CreateError(Error):
+    pass
+
+
+class ExtractError(Error):
+    pass
+
+
+class InitializeCacheError(Error):
+    pass
+
+
+class CleanCacheError(Error):
+    pass
+
+
 cdef class Repository(object):
 
     cdef repository *thisptr
@@ -44,15 +68,24 @@ cdef class Repository(object):
             del self.thisptr
 
     def create(self, str path, bool strip=False):
-        cdef string path_ = _encode(path)
-        with nogil:
-            self.thisptr.create(path_, strip)
+        cdef string path_ = None
+        try:
+            path_ = _encode(path)
+            with nogil:
+                self.thisptr.create(path_, strip)
+        except Exception as e:
+            raise CreateError(path=path, strip=strip) from e
 
     def extract(self, str package, str path):
-        cdef string package_ = _encode(package)
-        cdef string path_ = _encode(path)
-        with nogil:
-            self.thisptr.extract(package_, path_)
+        cdef string package_ = None
+        cdef string path_ = None
+        try:
+            package_ = _encode(package)
+            path_ = _encode(path)
+            with nogil:
+                self.thisptr.extract(package_, path_)
+        except Exception as e:
+            raise ExtractError(package=package, path=path) from e
 
     @staticmethod
     def initialize_cache(str config):
@@ -61,5 +94,8 @@ cdef class Repository(object):
             initialize_cache(config_)
 
     def clean_cache(self):
-        with nogil:
-            self.thisptr.clean_cache()
+        try:
+            with nogil:
+                self.thisptr.clean_cache()
+        except Exception as e:
+            raise CleanCacheError() from e
