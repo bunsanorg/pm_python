@@ -68,7 +68,7 @@ cdef class Repository(object):
             del self.thisptr
 
     def create(self, str path, bool strip=False):
-        cdef string path_ = None
+        cdef string path_
         try:
             path_ = _encode(path)
             with nogil:
@@ -77,8 +77,8 @@ cdef class Repository(object):
             raise CreateError(path=path, strip=strip) from e
 
     def extract(self, str package, str path):
-        cdef string package_ = None
-        cdef string path_ = None
+        cdef string package_
+        cdef string path_
         try:
             package_ = _encode(package)
             path_ = _encode(path)
