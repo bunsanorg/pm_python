@@ -1,5 +1,7 @@
 # distutils: language = c++
 # distutils: libraries = bunsan_pm_compatibility
+# distutils: include_dirs = ../pm/include
+# distutils: library_dirs = ../pm/build
 # distutils: extra_compile_args = -std=c++11
 
 
